@@ -6,11 +6,10 @@ const {
   getSingleHouseById,
   bookHouse,
   allBookedHouse,
+  switchAdmin,
 } = require('../controllers/user.controlller');
 
 const router = express.Router();
-
-
 
 // signup
 router.post('/signup', userSignup);
@@ -26,8 +25,10 @@ router.get('/house/:id', getSingleHouseById);
 // book a house
 router.put('/house/book/:id', bookHouse);
 
-// get all booked house 
+// get all booked house
 router.get('/booked', allBookedHouse);
 
+// change to admin
+router.put('/admin/:id', switchAdmin);
 
 module.exports = router;

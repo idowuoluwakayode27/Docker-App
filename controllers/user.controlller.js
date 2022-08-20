@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const House = require('../models/house.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sendEmail = require('../mail/email-sender');
 
 exports.userSignup = async (req, res) => {
   const { password, email, name } = req.body;
@@ -14,7 +15,14 @@ exports.userSignup = async (req, res) => {
       email,
       password: hashedPassword,
     });
-
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: `${user.name} Registered Successfully`,
+    //   message: `<div>
+    //       <h1>HELLO ${user.name}</h1>
+    //       <h2>You just registered successfully</h2>
+    //   </div>`,
+    // });
     return res
       .status(201)
       .json({ message: 'User created successfully', userId: user._id });
@@ -29,6 +37,7 @@ exports.userSignup = async (req, res) => {
 exports.userLogin = async (req, res) => {
   const { password, email } = req.body;
   try {
+    // validation
     if (!(password && email)) {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
@@ -142,6 +151,25 @@ exports.allBookedHouse = async (req, res) => {
       booked_house,
     };
     return res.status(200).json(dataInfo);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: error.message.kind, message: 'internal server error' });
+  }
+};
+
+exports.switchAdmin = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOneAndUpdate(
+      id,
+      {
+        role: 'admin',
+      },
+      { new: true }
+    );
+    return res.status(200).json(user);
   } catch (error) {
     console.log(error);
     return res
